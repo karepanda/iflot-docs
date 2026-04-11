@@ -1,0 +1,15 @@
+site_name: iFlot Docs
+
+theme:
+  name: material
+
+nav:
+  - Home: index.md
+  - Vision: vision/index.md
+  - Discovery: discovery/index.md
+  - Architecture: architecture/index.md
+  - ADR: adr/index.md
+  - Domain: domain/index.md
+  - Design: design/index.md
+  - Engineering: engineering/index.md
+  - Onboarding: onboarding/index.md
