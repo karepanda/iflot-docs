@@ -23,10 +23,20 @@ nav:
 
   - Discovery: discovery/index.md
 
-  - Architecture: architecture/index.md
+  - Architecture:
+      - Overview: architecture/index.md
+      - C4 Model:
+          - Overview: analysis/c4/index.md
+          - System Context: analysis/c4/system-context.md
+          - Container Diagram: analysis/c4/container-diagram.md
 
   - ADR:
       - Overview: adr/index.md
+      - ADR-001 — Product and System Direction: adr/ADR-001-product-and-system-direction.md
+      - ADR-002 — API Package Structure and Internal Architecture: adr/ADR-002-API-package-structure-and-internal-architecture.md
+      - ADR-003 — Frontend Framework Selection: adr/ADR-003-frontend-framework-selection.md
+      - ADR-004 — Infrastructure and Deployment Strategy: adr/ADR-004-infrastructure-and-deployment-strategy.md
+      - ADR-005 — Observability Strategy: adr/ADR-005-observability-strategy.md
 
   - Domain: domain/index.md
 
