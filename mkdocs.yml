@@ -1,15 +1,56 @@
 site_name: iFlot Docs
+site_description: Central documentation for the iFlot project
 
 theme:
   name: material
+  features:
+    - navigation.sections
+    - navigation.expand
+    - search.highlight
+    - content.code.copy
 
 nav:
   - Home: index.md
+
   - Vision: vision/index.md
+
+  - Overview:
+      - Product Overview: overview/product-overview.md
+      - Problem Statement: overview/problem-statement.md
+      - Target Clients: overview/target-clients.md
+      - Value Proposition: overview/value-proposition.md
+      - Current Status: overview/current-status.md
+
   - Discovery: discovery/index.md
+
   - Architecture: architecture/index.md
-  - ADR: adr/index.md
+
+  - ADR:
+      - Overview: adr/index.md
+
   - Domain: domain/index.md
-  - Design: design/index.md
+
+  - Design:
+      - Overview: design/index.md
+      - Figma Links: design/figma-links.md
+
   - Engineering: engineering/index.md
+
   - Onboarding: onboarding/index.md
+
+  - Analysis:
+      - Framework Evaluation: analysis/frontend-framework-evaluation.md
+      - Framework Evaluation (Original): analysis/frontend-framework-analysis-v1.md
+
+plugins:
+  - search
+
+markdown_extensions:
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - tables
+  - toc:
+      permalink: true
