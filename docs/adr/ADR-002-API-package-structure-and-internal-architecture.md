@@ -1,8 +1,8 @@
 # ADR-002 — API Package Structure and Internal Architecture
 
-**Status:** Accepted
-**Date:** April 2026
-**Authors:** Architecture Lead
+**Status:** Accepted  
+**Date:** April 2026  
+**Authors:** Architecture Lead  
 
 ---
 
@@ -23,6 +23,10 @@ These two concerns have fundamentally different complexity profiles. Access
 control is CRUD with security rules on top. Fleet management has rich domain
 logic, explicit state machines, business invariants, and precondition-enforced
 transitions that were the primary source of failure in the legacy system.
+
+Authentication is expected to integrate with external identity providers
+(e.g., Google). Identity is delegated externally, while authorization
+(tenant membership, roles, permissions) is fully managed inside iFlot.
 
 A single internal architecture applied uniformly to both concerns would either
 over-engineer access control or under-engineer fleet management.
@@ -93,31 +97,26 @@ com.iflot.platform.access
     │     ├── PermissionEntity
     │     ├── PermissionMapper
     │     └── dto
-    └── shared
-          ├── config
-          ├── exception
-          ├── logging
-          └── security
 ```
 
 This is still a 3-layer architecture:
 
-- Presentation lives in controllers
-- Application logic lives in services
-- Persistence lives in repositories and JPA entities
+- **Presentation** lives in controllers
+- **Application logic** lives in services
+- **Persistence** lives in repositories and JPA entities
 
-The package organization is feature-first because that is the clearest structure
-for this module size and team composition.
+Authentication integrates with external identity providers, while the Access
+module is responsible for resolving internal user context, tenant membership,
+roles, and permissions.
 
 ---
 
-#### `com.iflot.platform.fleet` — Hexagonal architecture
+#### `com.iflot.platform.fleet` — Hexagonal architecture aligned with DDD
 
 Fleet management is the core domain. It contains explicit lifecycle state
 machines, business invariants enforced at write time, and precondition-validated
-transitions. These characteristics justify hexagonal architecture: the domain
-must be testable without Spring, and infrastructure must be replaceable without
-touching domain logic.
+transitions. These characteristics justify hexagonal architecture combined with
+DDD principles.
 
 ```
 com.iflot.platform.fleet
@@ -127,25 +126,72 @@ com.iflot.platform.fleet
     │     │     ├── guide
     │     │     └── preinvoice
     │     ├── port
-    │     │     ├── in
     │     │     └── out
+    │     │           ├── TripRepository
+    │     │           ├── GuideRepository
+    │     │           └── PreInvoiceRepository
     │     └── service
     ├── application
-    └── infrastructure
-          ├── persistence
-          └── web
+    │     ├── port
+    │     │     └── in
+    │     │           ├── CreateTripUseCase
+    │     │           ├── CloseTripUseCase
+    │     │           └── CloseGuideUseCase
+    │     └── service
+    └── adapter
+          ├── in
+          │     └── web
+          └── out
+                └── persistence
 ```
 
-**Layer responsibilities in `fleet`:**
+#### Layer responsibilities in `fleet`
 
-- `domain` — aggregates, entities, value objects, business invariants, domain
-  services, lifecycle rules, and domain ports
-- `application` — use case orchestration and transaction coordination only
-- `infrastructure` — persistence adapters, web adapters, external system
-  adapters, and framework-specific implementation details
+- `domain/model` — aggregates, entities, value objects, invariants, lifecycle rules  
+- `domain/port/out` — repository interfaces defined by the domain  
+- `domain/service` — domain services  
+- `application/port/in` — use case interfaces  
+- `application/service` — orchestration only (no business rules)  
+- `adapter/in/web` — REST controllers  
+- `adapter/out/persistence` — JPA adapters  
 
-The application layer must not become a second business layer. Business rules
-belong exclusively to domain.
+#### Dependency rule
+
+```
+adapter  →  application  →  domain
+                ↑
+         (domain defines port/out)
+                ↓
+adapter/out implements domain/port/out
+```
+
+Dependencies always point inward.
+
+---
+
+### Domain purity rule
+
+The domain layer must not depend on Spring or any framework-specific libraries.
+
+No annotations such as `@Entity`, `@Service`, or `@Component` are allowed in:
+
+```
+com.iflot.platform.fleet.domain
+```
+
+The domain is pure Java and fully testable without application context.
+
+---
+
+### Module isolation rule
+
+Modules must not depend on each other's internal implementation.
+
+- `access` must not access `fleet` packages directly  
+- `fleet` must not access `access` packages directly  
+
+Any interaction must happen through explicit contracts or application-level
+orchestration.
 
 ---
 
@@ -162,11 +208,9 @@ com.iflot.platform.shared
     └── logging
 ```
 
-`shared` must remain minimal. If a class belongs conceptually to a specific
-module, it must not be placed in `shared`.
+`shared` must remain minimal.
 
-`shared` is not a convenience location, but a strict boundary for truly
-cross-cutting concerns.
+It is not a convenience location — only truly cross-cutting concerns belong here.
 
 ---
 
@@ -174,79 +218,44 @@ cross-cutting concerns.
 
 Architecture style is decided per module based on domain complexity:
 
-- Support subdomains may use simpler patterns, such as 3-layer architecture
-- Core domains must use architectures that enforce domain boundaries, such as
-  hexagonal architecture
+- Support subdomains → 3-layer architecture  
+- Core domains → hexagonal + DDD  
 
-There is no global rule enforcing a single architecture style across the entire
-system.
+There is no global rule enforcing a single architecture style.
 
 ---
 
 ## Rationale
 
-**Why different architectures in the same deployable?**
-Architecture style is a response to complexity, not a project-wide uniform rule.
-Applying hexagonal architecture to access control adds indirection without
-benefit. Applying 3-layer architecture to fleet management would reproduce the
-legacy failure pattern: business rules embedded in services with no enforced
-domain boundaries.
+Architecture style is a response to complexity, not a uniform rule.
 
-**Why feature-first inside `access`?**
-Access control has limited domain complexity and a small number of closely
-related classes per feature. Organizing the module by feature keeps the structure
-clear, reduces navigation overhead, and is easier for junior developers to work
-with. A package-by-layer root structure would spread one small feature across too
-many technical folders with no real benefit.
+Access does not justify hexagonal complexity.  
+Fleet cannot safely operate without it.
 
-**Why `fleet` as a single module and not `operations`/`billing`/`reporting` separately?**
-Operations, billing, and reporting are facets of the same business problem —
-closing the loop from trip execution to billing. The architecture foundation
-states this explicitly as the core value proposition. Splitting them into
-separate top-level modules would create artificial boundaries where the domain
-has none, and force cross-module coupling for every billing precondition check.
+The domain defines persistence contracts (`domain/port/out`), not the application
+layer, ensuring true DDD alignment.
 
-**Why `com.iflot.platform` and not `com.iflot.api`?**
-`api` in a Java package name implies the HTTP entry layer, not the full backend.
-`platform` describes the system without encoding deployment or infrastructure
-assumptions into the package root.
+`adapter` is used instead of `infrastructure` to reflect hexagonal terminology.
+
+`platform` avoids encoding HTTP or deployment concerns into package naming.
 
 ---
 
 ## Consequences
 
-- Developers working on `access` use standard Spring patterns with low onboarding
-  friction.
-- Developers working on `fleet` must understand hexagonal architecture, which
-  adds initial learning cost but matches the domain complexity.
-- Domain logic in `fleet` is testable without Spring context.
-- Adding new modules follows the same principle: assess complexity, choose the
-  architecture style intentionally, and place the module under
-  `com.iflot.platform`.
-- Extracting `fleet` to a separate deployable in the future would require mostly
-  infrastructure changes, because domain and application layers are already
-  decoupled from Spring.
-- `shared` requires discipline; misuse would create hidden coupling and erode
-  module boundaries.
+- Fast onboarding in `access`
+- Strong domain isolation in `fleet`
+- Testable domain without Spring
+- Clean path to future service extraction
+- Clear pattern for adding new modules
+- Risk of misuse of `shared` mitigated by strict rules
 
 ---
 
 ## Alternatives considered
 
-**Uniform 3-layer across all modules**
-Rejected. Insufficient for fleet management domain complexity. Reproduces the
-structural failure pattern of the legacy system.
-
-**Uniform hexagonal across all modules**
-Rejected. Over-engineers access control. Adds indirection without domain
-justification in support subdomains.
-
-**Package-by-layer root structure inside `access`**
-Rejected. It spreads small features across too many technical folders and makes
-navigation harder for little gain.
-
-**Separate deployables for `access` and `fleet` from day one**
-Rejected. Premature decomposition. There is no current driver for it: single
-team, early phase, and no operational need that justifies immediate separation.
-Extraction remains possible later without structural migration if a real driver
-emerges.
+**Uniform 3-layer** — rejected (too weak for domain)  
+**Uniform hexagonal** — rejected (overkill for support subdomains)  
+**All ports in application (Homberg)** — partially adopted  
+**Package-by-layer in access** — rejected  
+**Separate deployables** — rejected (premature)
