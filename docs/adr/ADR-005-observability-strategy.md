@@ -1,8 +1,7 @@
 # ADR-005 — Observability Strategy
 
-**Status:** Accepted
 **Date:** April 2026
-**Authors:** Architecture Lead
+
 
 ---
 
