@@ -21,6 +21,9 @@ the trade-offs accepted.
 | [ADR-003](ADR-003-frontend-framework-selection.md) | Frontend Framework Selection | Accepted | 2026-04-11 |
 | [ADR-004](ADR-004-infrastructure-and-deployment-strategy.md) | Infrastructure and Deployment Strategy | Accepted | 2026-04-12 |
 | [ADR-005](ADR-005-observability-strategy.md) | Observability Strategy | Accepted | 2026-04-12 |
+| [ADR-006](ADR-006-observability-stack.md) | Observability Architecture, Telemetry Model, and Operational Standards | Accepted | 2026-04-19 |
+| [ADR-007](ADR-007-context-backend-propagation-observability-layer.md) | Context Backend Propagation for the Observability Layer | Accepted | 2026-04-19 |
+| [ADR-008](ADR-008-frontend-observability-instrumentation.md) | Frontend Observability Instrumentation | Accepted | 2026-04-19 |
 
 ## Template
 
