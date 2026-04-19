@@ -1,0 +1,58 @@
+.
+├── diagrams
+│   └── structurizr
+│       ├── c1-system-context.dsl
+│       └── c2-container.dsl
+├── docs
+│   ├── adr
+│   │   ├── ADR-001-product-and-system-direction.md
+│   │   ├── ADR-002-API-package-structure-and-internal-architecture.md
+│   │   ├── ADR-003-frontend-framework-selection.md
+│   │   ├── ADR-004-infrastructure-and-deployment-strategy.md
+│   │   ├── ADR-005-observability-strategy.md
+│   │   ├── ADR-006-observability-stack.md
+│   │   ├── ADR-007-context-backend-propagation-observability-layer.md
+│   │   ├── ADR-008-frontend-observability-instrumentation.md
+│   │   ├── adr-template.md
+│   │   └── index.md
+│   ├── analysis
+│   │   ├── c4
+│   │   │   ├── container-diagram.md
+│   │   │   ├── index.md
+│   │   │   └── system-context.md
+│   │   ├── frontend-framework-analysis-v1.md
+│   │   └── frontend-framework-evaluation.md
+│   ├── architecture
+│   │   └── index.md
+│   ├── design
+│   │   ├── figma-links.md 
+│   │   └── index.md
+│   ├── discovery
+│   │   └── index.md
+│   ├── domain
+│   │   └── index.md
+│   ├── engineering
+│   │   ├── index.md
+│   │   └── observability
+│   │       ├── context-propagation-standard.md
+│   │       ├── flow-slo-catalog.md
+│   │       ├── index.md
+│   │       ├── log-schema.md
+│   │       └── metric-catalog.md
+│   ├── index.md
+│   ├── onboarding
+│   │   └── index.md
+│   ├── overview
+│   │   ├── current-status.md
+│   │   ├── problem-statement.md
+│   │   ├── product-overview.md
+│   │   ├── target-clients.md
+│   │   └── value-proposition.md
+│   └── vision
+│       └── index.md
+├── mkdocs.yml
+├── README.md
+├── requirements.txt
+└── tree.txt
+
+16 directories, 40 files

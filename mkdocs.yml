@@ -37,6 +37,9 @@ nav:
       - ADR-003 — Frontend Framework Selection: adr/ADR-003-frontend-framework-selection.md
       - ADR-004 — Infrastructure and Deployment Strategy: adr/ADR-004-infrastructure-and-deployment-strategy.md
       - ADR-005 — Observability Strategy: adr/ADR-005-observability-strategy.md
+      - ADR-006 — Observability Stack: adr/ADR-006-observability-stack.md
+      - ADR-007 — Context Backend Propagation Observability Layer: adr/ADR-007-context-backend-propagation-observability-layer.md
+      - ADR-008 — Frontend Observability Instrumentation: adr/ADR-008-frontend-observability-instrumentation.md
 
   - Domain: domain/index.md
 
@@ -44,7 +47,14 @@ nav:
       - Overview: design/index.md
       - Figma Links: design/figma-links.md
 
-  - Engineering: engineering/index.md
+  - Engineering:
+      - Overview: engineering/index.md
+      - Observability:
+          - Overview: engineering/observability/index.md
+          - Context Propagation Standard: engineering/observability/context-propagation-standard.md
+          - Flow SLO Catalog: engineering/observability/flow-slo-catalog.md
+          - Log Schema: engineering/observability/log-schema.md
+          - Metric Catalog: engineering/observability/metric-catalog.md
 
   - Onboarding: onboarding/index.md
 
