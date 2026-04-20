@@ -24,7 +24,8 @@ the trade-offs accepted.
 | [ADR-006](ADR-006-observability-stack.md) | Observability Architecture, Telemetry Model, and Operational Standards | Accepted | 2026-04-19 |
 | [ADR-007](ADR-007-context-backend-propagation-observability-layer.md) | Context Backend Propagation for the Observability Layer | Accepted | 2026-04-19 |
 | [ADR-008](ADR-008-frontend-observability-instrumentation.md) | Frontend Observability Instrumentation | Accepted | 2026-04-19 |
-| [ADR-009](ADR-009-Proposal for Adopting Paraglide JS as the i18n Library.md) | Frontend i18n  | Pending | 2026-04-19 |
+| [ADR-009](ADR-009-Proposal-for-Adopting-Paraglide-JS-as-the-i18n-Library.md) | Frontend i18n | Pending | 2026-04-19 |
+
 ## Template
 
 Use [adr-template.md](adr-template.md) for new records.
